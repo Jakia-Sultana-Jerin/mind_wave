@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mind_wave/pinned.dart';
 // import 'firebase_options.dart';
 // import  'firebase'
 //import 'home.dart';
 import 'login.dart';
 import 'prompt.dart';
+import 'filter.dart';
+import 'pinned.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,7 +35,12 @@ class MyApp extends StatelessWidget {
       //   home: Login(),
       //   home: Prompt(),
       initialRoute: '/',
-      routes: {'/': (context) => Login(), '/Prompt': (context) => Prompt()},
+      routes: {
+        '/': (context) => Login(),
+        '/Prompt': (context) => Prompt(),
+        '/Filter': (context) => Filterscreen(),
+        '/Pin': (context) => Pinnedmessage(),
+      },
     );
   }
 }
