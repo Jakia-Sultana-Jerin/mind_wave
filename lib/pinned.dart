@@ -22,6 +22,38 @@ class _Pinnedmessage extends State<Pinnedmessage> {
           ),
         ),
       ),
+
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat_bubble_outline),
+            label: "Chats",
+            backgroundColor: Colors.blue,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.tune_rounded),
+            label: "Filter",
+
+            backgroundColor: Colors.blue,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.key_rounded),
+            label: "Pin",
+            backgroundColor: Colors.blue,
+          ),
+        ],
+
+        currentIndex: 2,
+        onTap: (int index) {
+          if (index == 0) {
+            Navigator.pushNamed(context, '/Prompt');
+          }
+
+          if (index == 1) {
+            Navigator.pushNamed(context, '/Filter');
+          }
+        },
+      ),
     );
   }
 }
