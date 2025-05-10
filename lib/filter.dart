@@ -1,4 +1,3 @@
-import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
 
 class Filterscreen extends StatefulWidget {

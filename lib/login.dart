@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:mind_wave/dashboard.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,6 +11,8 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -31,10 +34,25 @@ class _LoginState extends State<Login> {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   @override
+  void initState() {
+    super.initState();
+    _checkUser();
+  }
+
+  void _checkUser() async {
+    if (_googleSignIn.currentUser != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Dashboard()),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //    appBar: AppBar(title: const Text('Login Page')),
       body: Container(
+        width: double.infinity,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.primary,
           image: DecorationImage(
@@ -43,14 +61,24 @@ class _LoginState extends State<Login> {
             repeat: ImageRepeat.repeat,
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: ElevatedButton(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            SizedBox(),
+            Image.asset("assets/images/logo.png", height: 80, width: 80),
+            FilledButton.icon(
               onPressed: _handleSignIn,
-              child: Image.asset('assets/images/google_button.png'),
+              label: const Text(
+                "Signin with google",
+                style: TextStyle(color: Colors.black),
+              ),
+              icon: const Text("G", style: TextStyle(color: Colors.black)),
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -63,7 +91,6 @@ class _LoginState extends State<Login> {
       GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
       if (googleUser == null) {
-      
         return;
       }
 
@@ -82,15 +109,13 @@ class _LoginState extends State<Login> {
 
       User? user = userCredential.user;
       if (user != null) {
-       
-        print("Successfully logged in as ${user.displayName}");
-        // ignore: use_build_context_synchronously
-        Navigator.pushNamed(context, '/Prompt');
-        // You can navigate to another screen or do other actions here
+       Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Dashboard()),
+      );
       }
       // ignore: use_build_context_synchronously
     } catch (error) {
-   
       print("Error during sign-in: $error");
     }
   }

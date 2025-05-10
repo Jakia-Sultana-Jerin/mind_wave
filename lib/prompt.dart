@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:bubble/bubble.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -61,169 +60,190 @@ class _PromptState extends State<Prompt> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Container(
-          height: double.infinity,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary,
-            image: DecorationImage(
-              image: AssetImage("assets/images/background.png"),
-              opacity: 0.4,
-              repeat: ImageRepeat.repeat,
-            ),
+    return Container(
+        height: double.infinity,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.primary,
+          image: DecorationImage(
+            image: AssetImage("assets/images/background.png"),
+            opacity: 0.4,
+            repeat: ImageRepeat.repeat,
           ),
-          child: Column(
-            children: [
-              StreamBuilder(
-                stream: _usersStream,
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) return Text("Something went wrong!");
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            StreamBuilder(
+              stream: _usersStream,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Center(child: Text("Something went wrong!"));
+                }
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+    
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (_scrollController.hasClients) {
+                    _scrollController.animateTo(
+                      _scrollController.position.maxScrollExtent,
+                      duration: Duration(milliseconds: 300),
+                      curve: Curves.easeOut,
+                    );
                   }
-
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (_scrollController.hasClients) {
-                      _scrollController.animateTo(
-                        _scrollController.position.maxScrollExtent,
-                        duration: Duration(milliseconds: 300),
-                        curve: Curves.easeOut,
-                      );
-                    }
-                  });
-
-                  return Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        itemCount: snapshot.data!.docs.length,
-                        itemBuilder: (context, index) {
-                          Map<String, dynamic> message =
-                              snapshot.data!.docs[index].data()
-                                  as Map<String, dynamic>;
-
-                          return Bubble(
-                            margin: BubbleEdges.only(top: 10),
-                            alignment:
-                                message["from"] == "system"
-                                    ? Alignment.topLeft
-                                    : Alignment.topRight,
-                            nip:
-                                message["from"] == "system"
-                                    ? BubbleNip.leftBottom
-                                    : BubbleNip.rightBottom,
-                            color:
-                                message["from"] == "system"
-                                    ? null
-                                    : Color.fromRGBO(225, 255, 199, 1.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if ((message["text"] ?? "").isNotEmpty)
-                                  Text('${message["text"]}'),
-
-                                if(message["from"]== "system")
-                                Image.network(
-                                  message["media"]??"",
-                                  height: 1024,
-                                  width: 1024,
-                                  loadingBuilder: (
-                                    context,
-                                    child,
-                                    loadingProgress,
-                                  ) {
-                                    return CircularProgressIndicator();
-                                  },
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Image.asset(
-                                      "assets/images/failedimage.jpg",
-                                    );
+                });
+    
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      itemCount: snapshot.data!.docs.length,
+                      physics: BouncingScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        Map<String, dynamic> message =
+                            snapshot.data!.docs[index].data()
+                                as Map<String, dynamic>;
+    
+                        return Bubble(
+                          margin: BubbleEdges.symmetric(vertical: 8),
+                          padding: BubbleEdges.symmetric(vertical: 8),
+                          alignment:
+                              message["from"] == "system"
+                                  ? Alignment.topLeft
+                                  : Alignment.topRight,
+                          nip:
+                              message["from"] == "system"
+                                  ? BubbleNip.leftBottom
+                                  : BubbleNip.rightBottom,
+                          color:
+                              message["from"] == "system"
+                                  ? null
+                                  : const Color.fromRGBO(225, 255, 199, 1.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (message["from"] != "system" &&
+                                  (message["text"] ?? "").isNotEmpty)
+                                Text('${message["text"]}'),
+    
+                              if (message["from"] == "system")
+                                Builder(
+                                  builder: (context) {
+                                    final media = message["media"];
+                                    final hasMedia =
+                                        media != null &&
+                                        media.toString().isNotEmpty;
+    
+                                    return hasMedia
+                                        ? Image.network(
+                                          media,
+                                          width:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.width *
+                                              0.7,
+                                          height:
+                                              (MediaQuery.of(
+                                                    context,
+                                                  ).size.width *
+                                                  0.7) *
+                                              (message['width'] /
+                                                  message['height']),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (
+                                            context,
+                                            error,
+                                            stackTrace,
+                                          ) {
+                                            return Image.asset(
+                                              "assets/images/failedimage.jpg",
+                                              width:
+                                                  MediaQuery.of(
+                                                    context,
+                                                  ).size.width *
+                                                  .7,
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
+                                        )
+                                        : Container(
+                                          height:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.width *
+                                              0.7,
+                                          width:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.width *
+                                              0.7,
+                                          color: Colors.grey.shade200,
+                                        );
                                   },
                                 ),
-                              ],
-                            ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
+            Divider(
+              height: 1,
+              color: Theme.of(context).dividerColor.withAlpha(100),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.end,
+                spacing: 8,
+                children: [
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(26),
+                        color: Colors.grey[200],
+                      ),
+                      child: TextField(
+                        controller: messageController,
+                        maxLines: 4,
+                        minLines: 1,
+                        onTap: () {
+                          _scrollController.animateTo(
+                            _scrollController.position.maxScrollExtent,
+                            duration: Duration(milliseconds: 300),
+                            curve: Curves.easeOut,
                           );
                         },
+                        decoration: InputDecoration(
+                          hintText: "Write something",
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.all(14.0),
+                        ),
                       ),
                     ),
-                  );
-                },
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  height: 50,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(26),
-                            color: Colors.grey[200],
-                          ),
-                          child: TextField(
-                            controller: messageController,
-                            maxLines: 4,
-                            minLines: 1,
-                            decoration: InputDecoration(
-                              hintText: "Write something",
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.all(14.0),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: IconButton(
-                          icon: Icon(Icons.send),
-                          color: Theme.of(context).primaryColor,
-                          onPressed: () => addMessage(),
-                        ),
-                      ),
-                    ],
                   ),
-                ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.send),
+                      color: Theme.of(context).primaryColor,
+                      onPressed: () => addMessage(),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.chat_bubble_outline),
-              label: "Chats",
-              backgroundColor: Colors.blue,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.tune_rounded),
-              label: "Filter",
-              backgroundColor: Colors.blue,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.key_rounded),
-              label: "Pin",
-              backgroundColor: Colors.blue,
             ),
           ],
-          currentIndex: 0,
-          onTap: (int index) {
-            if (index == 1) {
-              Navigator.pushNamed(context, '/Filter');
-            } else if (index == 2) {
-              Navigator.pushNamed(context, '/Pin');
-            }
-          },
         ),
-      ),
-    );
+      );
   }
 
   Future<void> replygpt(String messageID, height, width, textbody) async {
@@ -243,21 +263,10 @@ class _PromptState extends State<Prompt> {
     });
 
     final response1 = await http.post(url, headers: headers, body: body);
-    print("Status Code: ${response1.statusCode}");
-    print("Response Body: ${response1.body}");
     if (response1.statusCode == 200) {
-      print("Image generated by Cloudflare AI");
-      //   final data = jsonDecode(response1.body);
       final base64Image = base64Encode(response1.bodyBytes);
-      final imageBase64 = "data:image/png;base64,$base64Image";
-      var res = await uploader.uploadImageBase64(
-        base64Image: base64Image,
-        name: 'example',
-        expiration: 600,
-      );
+      var res = await uploader.uploadImageBase64(base64Image: base64Image);
       final imageurl = res?.url;
-      print(imageurl);
-
       await FirebaseFirestore.instance.collection("chat").doc(messageID).update(
         {"media": imageurl},
       );
