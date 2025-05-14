@@ -49,38 +49,38 @@ class _FilterState extends State<Filterscreen> {
           ],
         ),
       ),
-       bottomNavigationBar: BottomNavigationBar(
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.chat_bubble_outline),
-              label: "Chats",
-              backgroundColor: Colors.blue,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.tune_rounded),
-              label: "Filter",
+      //  bottomNavigationBar: BottomNavigationBar(
+      //     items: [
+      //       BottomNavigationBarItem(
+      //         icon: Icon(Icons.chat_bubble_outline),
+      //         label: "Chats",
+      //         backgroundColor: Colors.blue,
+      //       ),
+      //       BottomNavigationBarItem(
+      //         icon: Icon(Icons.tune_rounded),
+      //         label: "Filter",
 
-              backgroundColor: Colors.blue,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.key_rounded),
-              label: "Pin",
-              backgroundColor: Colors.blue,
-            ),
-          ],
+      //         backgroundColor: Colors.blue,
+      //       ),
+      //       BottomNavigationBarItem(
+      //         icon: Icon(Icons.key_rounded),
+      //         label: "Pin",
+      //         backgroundColor: Colors.blue,
+      //       ),
+      //     ],
 
-          currentIndex: 1,
-          onTap: (int index) {
-            if (index == 0) {
+      //     currentIndex: 1,
+      //     onTap: (int index) {
+      //       if (index == 0) {
            
-          Navigator.pushNamed(context, '/Prompt');
-            }
+      //     Navigator.pushNamed(context, '/Prompt');
+      //       }
 
-            if (index == 2) {
-              Navigator.pushNamed(context, '/Pin');
-            }
-          },
-        ),
+      //       if (index == 2) {
+      //         Navigator.pushNamed(context, '/Pin');
+      //       }
+      //     },
+      //   ),
     );
   }
 

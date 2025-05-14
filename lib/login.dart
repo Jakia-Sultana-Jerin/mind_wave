@@ -67,15 +67,23 @@ class _LoginState extends State<Login> {
             SizedBox(),
             Image.asset("assets/images/logo.png", height: 80, width: 80),
             FilledButton.icon(
+              icon: Image.asset(
+                'assets/images/googlelogo1-removebg-preview.png',
+                width: 29,
+                height: 29,
+              ),
+
               onPressed: _handleSignIn,
               label: const Text(
                 "Signin with google",
                 style: TextStyle(color: Colors.black),
               ),
-              icon: const Text("G", style: TextStyle(color: Colors.black)),
+              //  icon: const Text("G", style: TextStyle(color: Colors.black)),
+              // icon:Icon(Icons.)
               style: FilledButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.black,
+                // ),
               ),
             ),
           ],
@@ -109,10 +117,10 @@ class _LoginState extends State<Login> {
 
       User? user = userCredential.user;
       if (user != null) {
-       Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => Dashboard()),
-      );
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Dashboard()),
+        );
       }
       // ignore: use_build_context_synchronously
     } catch (error) {

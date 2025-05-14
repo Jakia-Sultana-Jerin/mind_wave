@@ -18,6 +18,13 @@ dependencies:
   filter_list: ^1.0.3
   http: ^1.3.0
   imgbb: ^0.0.1-beta
+  insta_image_viewer: ^1.0.4
+  share_plus: ^11.0.0
+  path_provider: ^2.1.5
+  file_saver: ^0.2.14
+  dio: ^5.8.0+1
+  easy_image_viewer: ^1.5.1
+  extended_image: ^10.0.1
 
 dev_dependencies:
   flutter_test:
@@ -45,3 +52,5 @@ flutter:
     - assets/images/background.png
     - assets/images/google_button.png
     - assets/images/failedimage.jpg
+    - assets/images/googlelogo.png
+    - assets/images/googlelogo1-removebg-preview.png
