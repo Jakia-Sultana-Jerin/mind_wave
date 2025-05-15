@@ -25,6 +25,7 @@ dependencies:
   dio: ^5.8.0+1
   easy_image_viewer: ^1.5.1
   extended_image: ^10.0.1
+  photo_viewer: ^0.0.3
 
 dev_dependencies:
   flutter_test:

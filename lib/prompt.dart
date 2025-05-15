@@ -4,19 +4,20 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:bubble/bubble.dart';
 import 'package:dio/dio.dart';
+import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:imgbb/imgbb.dart';
-import 'package:insta_image_viewer/insta_image_viewer.dart';
+//import 'package:insta_image_viewer/insta_image_viewer.dart';
 import 'package:mind_wave/service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:file_saver/file_saver.dart';
-import 'package:easy_image_viewer/easy_image_viewer.dart';
 
+import 'package:photo_viewer/photo_viewer.dart';
 
 class Prompt extends StatefulWidget {
   const Prompt({super.key});
@@ -65,6 +66,8 @@ class _PromptState extends State<Prompt> {
   List<Map> history = [];
 
   bool generateimage = false;
+  bool ispinned = false;
+  bool currentstate = false;
 
   /////share Image
 
@@ -110,6 +113,12 @@ class _PromptState extends State<Prompt> {
     mysnackbar("Sucessfully Download", context);
   }
 
+  void tapPin(String messageId, currentsate) async {
+    await FirebaseFirestore.instance.collection('chat').doc(messageId).update({
+      "pin": !currentsate,
+    });
+  }
+
   void addMessage() async {
     final textbody = messageController.text.trim();
     if (textbody.isEmpty) return;
@@ -136,6 +145,7 @@ class _PromptState extends State<Prompt> {
       height: 1024,
       width: 1024,
       text: "",
+      pin: false,
     );
 
     await replygpt(messageID, 1024, 1024, textbody);
@@ -234,23 +244,22 @@ class _PromptState extends State<Prompt> {
                                             aspectRatio:
                                                 (message['width'] /
                                                     message['height']),
+
                                             child: Column(
                                               children: [
-                                                InstaImageViewer(
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    showImageViewer(
+                                                      context,
+                                                      Image.network(
+                                                        media,
+                                                      ).image,
+                                                      swipeDismissible: true,
+                                                      doubleTapZoomable: true,
+                                                    );
+                                                  },
                                                   child: Image.network(
                                                     media,
-                                                    // width:R
-                                                    //     MediaQuery.of(
-                                                    //       context,
-                                                    //     ).size.width *
-                                                    //     0.7,
-                                                    // height:
-                                                    //     (MediaQuery.of(
-                                                    //           context,
-                                                    //         ).size.width *
-                                                    //         0.7) *
-                                                    //     (message['width'] /
-                                                    //         message['height']),
                                                     fit: BoxFit.cover,
                                                     errorBuilder: (
                                                       context,
@@ -259,11 +268,6 @@ class _PromptState extends State<Prompt> {
                                                     ) {
                                                       return Image.asset(
                                                         "assets/images/failedimage.jpg",
-                                                        // width:
-                                                        //     MediaQuery.of(
-                                                        //       context,
-                                                        //     ).size.width *
-                                                        //     .7,
                                                         fit: BoxFit.cover,
                                                       );
                                                     },
@@ -293,10 +297,24 @@ class _PromptState extends State<Prompt> {
                                               ),
 
                                               IconButton(
-                                                onPressed: () {
-                                                  //  downloadImage(media);
-                                                },
-                                                icon: Icon(Icons.push_pin),
+                                                onPressed:
+                                                    () => tapPin(
+                                                      snapshot
+                                                          .data!
+                                                          .docs[index]
+                                                          .id,
+                                                      message['pin'] 
+                                                    ),
+
+                                                icon: Icon(
+                                                  
+                                                       Icons.push_pin,
+                                                      
+                                                 color: 
+                                                   message['pin']
+                                                          ? Colors.orange
+                                                          : Colors.blue,
+                                                ),
                                               ),
                                             ],
                                           ),
